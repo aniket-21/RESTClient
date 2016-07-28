@@ -1566,6 +1566,11 @@ restclient.main = {
         auto_oauth_realm        = $('#oauth-setting [name="auto_oauth_realm"]'),
         oauth_realm             = $('#oauth-setting [name="oauth_realm"]'),
         disable_oauth_realm     = $('#oauth-setting [name="disable_oauth_realm"]'),
+
+        cred_use                = $('#signature-request [name="usecredentials"]'),
+        cred_username           = $('#signature-request [name="username"]'),
+        cred_password           = $('#signature-request [name="password"]'),
+
         setting                 = restclient.getPref('OAuth.setting', '');
     
     //$('#get-access-token .btnOkay').bind('click', restclient.main.oauthAuthorize);
@@ -1627,6 +1632,21 @@ restclient.main = {
       else
         oauth_nonce.val(restclient.oauth.getNonce()).removeClass('disabled').removeAttr('disabled');
     }
+
+    function useCredentials(use) {
+      if(typeof use === 'boolean') {
+        if(use){          
+          cred_use.attr('checked', true);
+          cred_username.val('').addClass('disabled').attr('disabled',true);
+          cred_password.val('').addClass('disabled').attr('disabled',true);
+        }
+        else{
+          cred_use.removeAttr('checked');
+          cred_username.val('').removeAttr('disabled').removeAttr('disabled');
+          cred_password.val('').removeAttr('disabled').removeAttr('disabled');
+        }
+      }
+    }
     
     //Load setting from preferences
     if (setting != '') {
@@ -1636,6 +1656,7 @@ restclient.main = {
       autoNonce (setting.auto_oauth_nonce === true);
       disableRealm (setting.disable_oauth_realm === true);
       autoRealm (setting.auto_oauth_realm === true);
+      useCredentials(false);
       
       oauth_realm.val((typeof (setting.oauth_realm) === 'string') ? setting.oauth_realm : '');
       $('#oauth-setting [name="oauth_version"] option[value="' + setting.oauth_version + '"]').attr('selected', true);
@@ -1647,6 +1668,7 @@ restclient.main = {
       autoNonce(true);
       disableRealm(true);
       autoRealm(true);
+      useCredentials(false);
     }
     
     $('#oauth-setting .btnOkay').click(function () {
@@ -1688,6 +1710,8 @@ restclient.main = {
     auto_oauth_realm.click(autoRealm);
     auto_oauth_timestamp.click(autoTimeStamp);
     auto_oauth_nonce.click(autoNonce);
+    cred_use.click(useCredentials);
+
 
 
     //Load oauth keys from preferences
@@ -1720,6 +1744,10 @@ restclient.main = {
         sign_access_token         = $('#signature-request [name="access_token"]'),
         sign_access_token_secret  = $('#signature-request [name="access_token_secret"]'),
         sign_remember             = $('#signature-request [name="remember"]'),
+
+        cred_use                  = $('#signature-request [name="usecredentials"]'),
+        cred_username             = $('#signature-request [name="username"]'),
+        cred_password             = $('#signature-request [name="password"]'),
 
         auto_oauth_timestamp      = $('#oauth-setting [name="auto_oauth_timestamp"]'),
         oauth_timestamp           = $('#oauth-setting [name="oauth_timestamp"]'),
