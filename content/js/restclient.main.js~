@@ -1622,6 +1622,7 @@ restclient.main = {
       }
     }
     function autoNonce(auto) {
+      console.log('autoNounce: ' + auto);
       if(typeof auto === 'boolean')
         if(auto)
           auto_oauth_nonce.attr('checked', true);
@@ -1636,6 +1637,8 @@ restclient.main = {
     }
 
     function useCredentials(use) {
+   debugger;
+
       if(typeof use === 'boolean') {
         if(use){          
           cred_use.attr('checked', true);
@@ -1651,11 +1654,11 @@ restclient.main = {
 
 	if(cred_use.attr('checked') === 'checked'){
 	  cred_username.val('').removeClass('disabled').removeAttr('disabled');
-	  cred_password.val('').removeClass('disabled').removeAttr('disabled');
+          cred_password.val('').removeClass('disabled').removeAttr('disabled');
 	}
 	else {
 	  cred_username.val('').addClass('disabled').attr('disabled',true);
-	  cred_password.val('').addClass('disabled').attr('disabled',true);
+          cred_password.val('').addClass('disabled').attr('disabled',true);
 	}
     }
     
