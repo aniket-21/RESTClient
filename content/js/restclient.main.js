@@ -1637,13 +1637,13 @@ restclient.main = {
       if(typeof use === 'boolean') {
         if(use){          
           cred_use.attr('checked', true);
-          cred_username.val('').addClass('disabled').attr('disabled',true);
-          cred_password.val('').addClass('disabled').attr('disabled',true);
+          cred_username.val('').removeAttr('disabled').removeAttr('disabled');
+          cred_password.val('').addClass('disabled').removeAttr('disabled');
         }
         else{
           cred_use.removeAttr('checked');
-          cred_username.val('').removeAttr('disabled').removeAttr('disabled');
-          cred_password.val('').removeAttr('disabled').removeAttr('disabled');
+          cred_username.val('').addClass('disabled').attr('disabled',true);
+          cred_password.val('').addClass('disabled').attr('disabled',true);
         }
       }
     }
