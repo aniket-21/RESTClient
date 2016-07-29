@@ -1572,6 +1572,8 @@ restclient.main = {
         cred_password           = $('#signature-request [name="password"]'),
 
         setting                 = restclient.getPref('OAuth.setting', '');
+
+        console.log(cred_use);
     
     //$('#get-access-token .btnOkay').bind('click', restclient.main.oauthAuthorize);
     $('#oauth-setting .help-block').hide();
@@ -1634,6 +1636,7 @@ restclient.main = {
     }
 
     function useCredentials(use) {
+      console.log('function useCredentials');
       if(typeof use === 'boolean') {
         if(use){          
           cred_use.attr('checked', true);
@@ -1656,7 +1659,7 @@ restclient.main = {
       autoNonce (setting.auto_oauth_nonce === true);
       disableRealm (setting.disable_oauth_realm === true);
       autoRealm (setting.auto_oauth_realm === true);
-      useCredentials(false);
+      useCredentials(setting.use_credentials !== true);
       
       oauth_realm.val((typeof (setting.oauth_realm) === 'string') ? setting.oauth_realm : '');
       $('#oauth-setting [name="oauth_version"] option[value="' + setting.oauth_version + '"]').attr('selected', true);
@@ -1690,6 +1693,7 @@ restclient.main = {
       param.auto_oauth_realm        = (auto_oauth_realm.attr('checked') === 'checked');
       param.disable_oauth_realm     = (disable_oauth_realm.attr('checked') === 'checked');
       param.oauth_realm             = oauth_realm.val();
+      param.use_credentials         = (cred_use.attr('checked') === 'checked');
       
       restclient.setPref('OAuth.setting', JSON.stringify(param));
       
