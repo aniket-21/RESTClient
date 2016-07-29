@@ -637,7 +637,7 @@ restclient.main = {
       var headerId = $(this).data('source-header-id'),
           text     = $('#modal-oauth-view textarea'),
           tag      = $('span[data-header-id="' + headerId + '"]'),
-          autoRefresh = $('#modal-oauth-view .btnAutoRefresh');
+          Refresh = $('#modal-oauth-view .btnAutoRefresh');
 
       text.val(tag.attr('header-value'));
 
@@ -1622,6 +1622,7 @@ restclient.main = {
       }
     }
     function autoNonce(auto) {
+      console.log('autoNounce: ' + auto);
       if(typeof auto === 'boolean')
         if(auto)
           auto_oauth_nonce.attr('checked', true);
@@ -1657,6 +1658,7 @@ restclient.main = {
       setting = JSON.parse(setting);
       
       autoTimeStamp (setting.auto_oauth_timestamp === true);
+      console.log('calling nounce when setting is not empty ' + (setting.auto_oauth_nonce === true));
       autoNonce (setting.auto_oauth_nonce === true);
       disableRealm (setting.disable_oauth_realm === true);
       autoRealm (setting.auto_oauth_realm === true);
@@ -1669,6 +1671,7 @@ restclient.main = {
     else
     {
       autoTimeStamp(true);
+      console.log('calling nounce when setting is  empty with true');
       autoNonce(true);
       disableRealm(true);
       autoRealm(true);
