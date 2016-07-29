@@ -1642,8 +1642,8 @@ restclient.main = {
       if(typeof use === 'boolean') {
         if(use){          
           cred_use.attr('checked', true);
-          cred_username.val('').removeAttr('disabled').removeAttr('disabled');
-          cred_password.val('').addClass('disabled').removeAttr('disabled');
+          cred_username.val('').removeClass('disabled').removeAttr('disabled');
+          cred_password.val('').removeClass('disabled').removeAttr('disabled');
         }
         else{
           cred_use.removeAttr('checked');
