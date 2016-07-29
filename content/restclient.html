@@ -328,27 +328,58 @@
           <div class="tab-pane active" id="signature-request">
             <form class="form-horizontal" onsubmit="return false;">
             <div class="control-group">
+              <label class="control-label" for="env">Environment</label>
+              <div class="controls">
+                <select name="environment" class="input-xlarge">
+                  <option value="Dev" selected>Development</option>
+                  <option value="Stg">Staging</option>
+                  <option value="Prd">Production</option>
+                </select>
+              </div>
+            </div>
+            <div class="control-group">
               <label for="consumer_key" class="control-label">Consumer key</label>
               <div class="controls">
-                <input type="text" name="consumer_key" class="input-xxlarge" placeholder="lPvnpgox1rS9xTy8p0DRtudP">
+                <input type="text" name="consumer_key" class="input-xxlarge">
               </div>
             </div>
             <div class="control-group">
               <label for="consumer_secret" class="control-label">Consumer secret</label>
               <div class="controls">
-                <input type="text" name="consumer_secret" class="input-xxlarge"  placeholder="lPvnpgox1rS9xTy8p0DRtudPePWNqtSjfkSqgFg">
+                <input type="text" name="consumer_secret" class="input-xxlarge">
               </div>
             </div>
             <div class="control-group">
               <label for="access_token" class="control-label">Access token</label>
               <div class="controls">
-                <input type="text" name="access_token" class="input-xxlarge" placeholder="1405721-iICeQLXdqTlEuYx2ipSlpa1KkPhnbxiN9KJporshQ">
+                <input type="text" name="access_token" class="input-xxlarge">
               </div>
             </div>
             <div class="control-group">
               <label for="access_token_secret" class="control-label">Access token secret</label>
               <div class="controls">
-                <input type="text" name="access_token_secret" class="input-xxlarge" placeholder="LgrNoNX4JNT3v03b2j6hPqQf6gHntUX5uI0CTLZs">
+                <input type="text" name="access_token_secret" class="input-xxlarge">
+              </div>
+            </div>
+            </div>
+            <div class="control-group">
+              <label for="use_credentials" class="control-label"></label>
+              <div class="controls">
+                <div class="input-append">
+                <span class="add-on"><input name="usecredentials" type="checkbox" style="margin-top:0px;margin-right: 6px;" checked>Use credentials to generate Access Token</span>              
+                </div>
+              </div>
+            </div>
+            <div class="control-group">
+              <label for="user_name" class="control-label">Username</label>
+              <div class="controls">
+                <input type="text" name="username" class="input-xlarge">
+              </div>
+            </div>
+            <div class="control-group">
+              <label for="password" class="control-label">Password</label>
+              <div class="controls">
+                <input type="text" name="password" class="input-xlarge">
               </div>
             </div>
           </form>
@@ -358,6 +389,7 @@
             </div>
             <input class="btn btn-info btnClose" type="button" value="Close" style="float:right;" onclick="$('#window-oauth').hide();">
             <div class="btn-group dropup" style="float:right; margin-right: 4px; text-align:left">
+              <a href="#" class="btn btn-success">Generate token</a>
               <button class="btn btn-success btnInsertAsHeader" style="padding: 3px 10px;">Insert</button>
               <button class="btn btn-success dropdown-toggle" data-toggle="dropdown" style="padding: 3px 6px;"><span class="caret"></span></button>
               <ul class="dropdown-menu pull-right">
