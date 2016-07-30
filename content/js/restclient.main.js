@@ -1617,6 +1617,7 @@ restclient.main = {
     }
 
     $('#signature-request .btnInsertAsHeader').bind('click', restclient.main.oauthSign);
+    $('#signature-request .btnGenerateToken').bind('click', restclient.main.generateAccessToken);
   },
   /*oauthAuthorize: function () {
     var authorize_consumer_key      = $('#get-access-token [name="consumer_key"]'),
@@ -1907,6 +1908,74 @@ restclient.main = {
       var autoRefresh = restclient.getPref('OAuth.refresh', "yes");
       restclient.main.setOAuthAutoRefresh(headerId, (autoRefresh === 'yes'));
     }
+  },
+  generateAccessToken: function() {
+      debugger
+      var environment               = $('#signature-request [name="environment"]'),
+          sign_consumer_key         = $('#signature-request [name="consumer_key"]'),
+          sign_consumer_secret      = $('#signature-request [name="consumer_secret"]');
+
+      if (sign_consumer_key.val() === '') {
+        sign_consumer_key.parents('.control-group').addClass('error');
+        errors.push(sign_consumer_key);
+      }
+
+      if (sign_consumer_secret.val() === '') {
+        sign_consumer_secret.parents('.control-group').addClass('error');
+        errors.push(sign_consumer_secret);
+      }
+
+      if (errors.length > 0) {
+        var el = errors.shift();
+        el.focus();
+        //console.error(el);
+        return false;
+      }
+      else
+      {
+        $('#signature-request .control-group').removeClass('error');
+        $('#signature-request .error-info').hide();
+      }
+
+      //Default host
+      var host = 'accounts-dev.autodesk.com';
+
+      //token end points
+      var requestTokenEndPoint = '/oauth/requesttoken';
+      var authorizeEndPoint = '/oauth/authorize';
+      var accessTokenEndPoint = '/oauth/accesstoken';
+
+      //Get Environment
+      if(environment === 'Stg')
+        host = "accounts-staging.autodesk.com";
+      else if(environment === 'Prd')
+        host = "accounts.autodesk.com";
+
+      //Derive Request Token URL
+      var requestTokenUrl = 'https://' + host + requestTokenEndPoint;
+
+      var secrets = {
+        consumer_key: sign_consumer_key.val() ,
+        consumer_secret: sign_consumer_secret.val()
+      }
+
+      var sign = {
+                  action: 'GET',
+                  path: requestTokenUrl,
+                  signatures: secrets
+                 };
+
+      /*if (auto_realm === true)
+        sign.realm = requestUrl;
+      else
+        if (typeof oauth_realm === 'string')
+          sign.realm = oauth_realm;*/
+      
+      restclient.log(sign);
+      var signature = restclient.oauth.sign(sign);
+      restclient.log(signature);
+      var headerValue = signature.headerString;
+      restclient.log(headerValue);
   },
   setOAuthAutoRefresh: function (headerId, auto) {
     $('[data-header-id="' + headerId + '"]').attr('auto-refresh', (auto) ? "yes" : "no");
