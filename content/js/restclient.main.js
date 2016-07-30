@@ -1411,6 +1411,13 @@ restclient.main = {
         auto_oauth_realm        = $('#oauth-setting [name="auto_oauth_realm"]'),
         oauth_realm             = $('#oauth-setting [name="oauth_realm"]'),
         disable_oauth_realm     = $('#oauth-setting [name="disable_oauth_realm"]'),
+
+
+        cred_use                  = $('#signature-request [name="usecredentials"]'),
+        cred_username             = $('#signature-request [name="username"]'),
+        cred_password             = $('#signature-request [name="password"]'),
+
+
         setting                 = restclient.getPref('OAuth.setting', '');
     
     //$('#get-access-token .btnOkay').bind('click', restclient.main.oauthAuthorize);
@@ -1758,10 +1765,6 @@ restclient.main = {
         sign_access_token         = $('#signature-request [name="access_token"]'),
         sign_access_token_secret  = $('#signature-request [name="access_token_secret"]'),
         sign_remember             = $('#signature-request [name="remember"]'),
-
-        cred_use                  = $('#signature-request [name="usecredentials"]'),
-        cred_username             = $('#signature-request [name="username"]'),
-        cred_password             = $('#signature-request [name="password"]'),
 
         auto_oauth_timestamp      = $('#oauth-setting [name="auto_oauth_timestamp"]'),
         oauth_timestamp           = $('#oauth-setting [name="oauth_timestamp"]'),
