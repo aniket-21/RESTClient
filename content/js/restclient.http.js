@@ -65,7 +65,7 @@ restclient.http = {
       else
         restclient.http.startTime = false;
         
-      xhr.send(requestBody);
+      return xhr.send(requestBody);
     } catch (e) {
       restclient.main.setResponseHeader({"Error": [
                                                   "Could not connect to server",

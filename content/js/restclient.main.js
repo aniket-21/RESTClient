@@ -1910,10 +1910,12 @@ restclient.main = {
     }
   },
   generateAccessToken: function() {
-      debugger
+      
       var environment               = $('#signature-request [name="environment"]'),
           sign_consumer_key         = $('#signature-request [name="consumer_key"]'),
-          sign_consumer_secret      = $('#signature-request [name="consumer_secret"]');
+          sign_consumer_secret      = $('#signature-request [name="consumer_secret"]'),
+          access_token              = $('#signature-request [name="access_token"]'),
+          errors = [];
 
       if (sign_consumer_key.val() === '') {
         sign_consumer_key.parents('.control-group').addClass('error');
@@ -1954,28 +1956,43 @@ restclient.main = {
       //Derive Request Token URL
       var requestTokenUrl = 'https://' + host + requestTokenEndPoint;
 
-      var secrets = {
-        consumer_key: sign_consumer_key.val() ,
-        consumer_secret: sign_consumer_secret.val()
-      }
-
       var sign = {
-                  action: 'GET',
-                  path: requestTokenUrl,
-                  signatures: secrets
+                    action: 'GET',
+                    path: requestTokenUrl,
+                    signatures: {
+                      consumer_key: sign_consumer_key.val() ,
+                      consumer_secret: sign_consumer_secret.val()
+                    },
+                    parameters: {
+                      oauth_signature_method: 'HMAC-SHA1'
+                    }                 
                  };
 
-      /*if (auto_realm === true)
-        sign.realm = requestUrl;
-      else
-        if (typeof oauth_realm === 'string')
-          sign.realm = oauth_realm;*/
-      
-      restclient.log(sign);
+      //Sign request for request token
       var signature = restclient.oauth.sign(sign);
       restclient.log(signature);
+
+      //Get Header
+      var headers = []; 
       var headerValue = signature.headerString;
+      headers.push(['Authorization', headerValue]);
       restclient.log(headerValue);
+
+      //Generate & Send Request for request Token
+      var request = {
+        method: 'GET',
+        url: requestTokenUrl,
+        headers: headers
+      };
+            
+      restclient.http.sendRequest(request.method, request.url, request.headers, '', '');
+
+      var requestToken = decodeURIComponent($('#response-body-raw').text().split('&')[0].split('oauth_token=')[1]).trim();
+      var requestTokenSecret = decodeURIComponent($('#response-body-raw').text().split('&')[1].split('oauth_token_secret=')[1]).trim();
+      
+      //URL for Authorize
+      debugger
+      var authorizeURL = 'https://' + host + authorizeEndPoint + '?/oauth_token=' + requesttoken;
   },
   setOAuthAutoRefresh: function (headerId, auto) {
     $('[data-header-id="' + headerId + '"]').attr('auto-refresh', (auto) ? "yes" : "no");
