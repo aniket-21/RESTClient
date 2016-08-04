@@ -1617,7 +1617,7 @@ restclient.main = {
     }
 
     $('#signature-request .btnInsertAsHeader').bind('click', restclient.main.oauthSign);
-    $('#signature-request .btnGenerateToken').bind('click', restclient.main.generateAccessToken);
+    $('#signature-request .btnGenerateToken').bind('click', restclient.main.generateRequestToken);
   },
   /*oauthAuthorize: function () {
     var authorize_consumer_key      = $('#get-access-token [name="consumer_key"]'),
@@ -1909,12 +1909,13 @@ restclient.main = {
       restclient.main.setOAuthAutoRefresh(headerId, (autoRefresh === 'yes'));
     }
   },
-  generateAccessToken: function() {
+  generateRequestToken: function() {
       
       var environment               = $('#signature-request [name="environment"]'),
           sign_consumer_key         = $('#signature-request [name="consumer_key"]'),
           sign_consumer_secret      = $('#signature-request [name="consumer_secret"]'),
-          access_token              = $('#signature-request [name="access_token"]'),
+          request_token             = $('#signature-request [name="request_token"]'),
+          request_token_secret      = $('#signature-request [name="request_token_secret"]'),
           errors = [];
 
       if (sign_consumer_key.val() === '') {
@@ -1938,6 +1939,9 @@ restclient.main = {
         $('#signature-request .control-group').removeClass('error');
         $('#signature-request .error-info').hide();
       }
+
+      request_token.val('');
+      request_token_secret.val('');
 
       //Default host
       var host = 'accounts-dev.autodesk.com';
@@ -1985,14 +1989,117 @@ restclient.main = {
         headers: headers
       };
             
-      restclient.http.sendRequest(request.method, request.url, request.headers, '', '');
+      restclient.http.sendRequestTokenRequest(request.method, request.url, request.headers, '', '');     
+  },
+  authorizeRequestToken: function(requestToken, requestTokenSecret) {
 
-      var requestToken = decodeURIComponent($('#response-body-raw').text().split('&')[0].split('oauth_token=')[1]).trim();
-      var requestTokenSecret = decodeURIComponent($('#response-body-raw').text().split('&')[1].split('oauth_token_secret=')[1]).trim();
-      
-      //URL for Authorize
-      debugger
-      var authorizeURL = 'https://' + host + authorizeEndPoint + '?/oauth_token=' + requesttoken;
+    //debugger
+    var environment = $('#signature-request [name="environment"]'),
+        username = $('#signature-request [name="username"]'),
+        password = $('#signature-request [name="password"]');
+
+    if(typeof requestToken !== 'string') {      
+      return;
+    }
+
+    if(requestToken === '') {
+      return;
+    }
+
+    //Default host
+    var host = 'accounts-dev.autodesk.com';
+    if(environment.val() === 'Stg')
+        host = "accounts-staging.autodesk.com";
+      else if(environment.val() === 'Prd')
+        host = "accounts.autodesk.com";
+
+    var authorizeEndPoint = '/OAuth/Authorize';
+
+    var returnUrl = 'https://' + host + authorizeEndPoint + '?oauth_token=' + requestToken + '&fromSignIn=true';
+    var referrerUrl = 'https://' + host + '/LogOn?ReturnUrl=' + encodeURIComponent(returnUrl);
+    var authorizeUrl = 'https://' + host + '/Authentication/LogOn?ReturnUrl=' + encodeURIComponent(returnUrl) ;
+
+    //Get Header
+    var headers = []; 
+    headers.push(['Accept', '*/*']);
+    headers.push(['Accept-Language', 'en-US,en;q=0.8']);
+    headers.push(['Referer', referrerUrl]);
+    headers.push(['Accept-Encoding', 'gzip, deflate, br']);
+    //headers.push(['X-Requested-With', 'XMLHttpRequest']);
+    headers.push(['content-type', 'application/x-www-form-urlencoded']);
+
+    //Generate & Send Request for request Token
+    var request = {
+      method: 'POST',
+      url: authorizeUrl,
+      headers: headers
+    };
+
+    //post params
+    var params = 'UserName=' + username.val() + '&Password=' + password.val() + '&RememberMe=false';
+            
+    restclient.http.sendAuthorizeRequest(request.method, request.url, request.headers, '', params);
+  },
+  generateAccessToken: function(requestToken, requestTokenSecret) {
+
+    var environment               = $('#signature-request [name="environment"]'),
+        sign_consumer_key         = $('#signature-request [name="consumer_key"]'),
+        sign_consumer_secret      = $('#signature-request [name="consumer_secret"]');
+    
+
+    if(typeof requestToken !== 'string' || requestToken === '') {      
+      return;
+    }
+
+    if(typeof requestTokenSecret !== 'string' || requestTokenSecret === '') {      
+      return;
+    }
+
+    //Default host
+    var host = 'accounts-dev.autodesk.com';
+    if(environment.val() === 'Stg')
+        host = "accounts-staging.autodesk.com";
+      else if(environment.val() === 'Prd')
+        host = "accounts.autodesk.com";
+
+    var accessTokenEndPoint = '/oauth/accesstoken';
+
+    //Derive Request Token URL
+    var accessTokenUrl = 'https://' + host + accessTokenEndPoint;
+
+    var sign = {
+                  action: 'GET',
+                  path: accessTokenUrl,
+                  signatures: {
+                    consumer_key: sign_consumer_key.val() ,
+                    consumer_secret: sign_consumer_secret.val(),
+                    oauth_token: requestToken,
+                    oauth_token_secret: requestTokenSecret
+                  },
+                  parameters: {
+                    oauth_signature_method: 'HMAC-SHA1'                    
+                  }                 
+               };
+
+    //Sign request for request token
+    var signature = restclient.oauth.sign(sign);
+    restclient.log(signature);
+
+    //Get Header
+    var headers = []; 
+    var headerValue = signature.headerString;
+    headers.push(['Authorization', headerValue]);
+    restclient.log(headerValue);
+
+    //Generate & Send Request for request Token
+    var request = {
+      method: 'GET',
+      url: accessTokenUrl,
+      headers: headers
+    };
+          
+    restclient.http.sendAccessTokenRequest(request.method, request.url, request.headers, '', ''); 
+
   },
   setOAuthAutoRefresh: function (headerId, auto) {
     $('[data-header-id="' + headerId + '"]').attr('auto-refresh', (auto) ? "yes" : "no");

@@ -65,7 +65,7 @@ restclient.http = {
       else
         restclient.http.startTime = false;
         
-      return xhr.send(requestBody);
+      xhr.send(requestBody);
     } catch (e) {
       restclient.main.setResponseHeader({"Error": [
                                                   "Could not connect to server",
@@ -147,5 +147,246 @@ restclient.http = {
     restclient.http.xhr.abort();
     restclient.main.clearResult();
     restclient.main.updateProgressBar(-1);
+  },
+  sendRequestTokenRequest: function(requestMethod, requestUrl, requestHeaders, mimeType, requestBody) {
+    try{
+      restclient.main.updateProgressBar(100);
+      restclient.main.showResponse();
+      restclient.http.mimeType = mimeType;
+      //restclient.log(requestMethod);
+      var xhr = Components.classes["@mozilla.org/xmlextras/xmlhttprequest;1"].createInstance(Components.interfaces.nsIXMLHttpRequest);
+      xhr.onerror = restclient.http.onerror;
+      xhr.onload = restclient.http.onRequestTokenLoad;
+      xhr.onprogress = restclient.http.onprogress;
+      
+      xhr.open(requestMethod, requestUrl, true);
+      xhr.setRequestHeader("Accept-Language", null);
+
+      for(var i=0, header; header = requestHeaders[i]; i++) {
+        xhr.setRequestHeader(header[0], header[1]);
+        
+        //Override XMLHTTPRequest default charset
+        if(typeof mimeType != 'string' && 
+            header[0].toLowerCase() == 'content-type' && header[1].toLowerCase().indexOf('charset') > -1)
+        {
+          xhr.overrideMimeType(header[1]);
+        }
+      }
+
+      if(typeof mimeType == 'string')
+        xhr.overrideMimeType(mimeType);
+
+      restclient.http.xhr = xhr;
+      if(restclient.getPref('requestTimer', false) === true)
+        restclient.http.startTime = new Date().getTime();
+      else
+        restclient.http.startTime = false;
+        
+      xhr.send(requestBody);
+    } catch (e) {
+      restclient.main.setResponseHeader({"Error": [
+                                                  "Could not connect to server",
+                                                  e.message
+                                                  ]}, false);
+      restclient.main.updateProgressBar(-1);
+    }
+  },
+  onRequestTokenLoad: function(xhr) {
+    if(restclient.http.startTime)
+    {
+      var requestTime = (new Date().getTime()) - restclient.http.startTime;
+      restclient.main.showStatus('Execute Time : ' + requestTime + 'ms')
+    }
+    restclient.main.clearResult();
+    xhr = xhr.target;
+    var headers = {};
+    headers["Status Code"] = xhr.status + " " + xhr.statusText;
+
+    var headersText     = xhr.getAllResponseHeaders(),
+        responseHeaders = headersText.split("\n"),
+        key, value;
+
+    for (var i = 0, header; header = responseHeaders[i]; i++) {
+      if(header.indexOf(":") > 0) {
+        key   = header.substring(0, header.indexOf(":"));
+        value = xhr.getResponseHeader(key);
+        if(value)
+          headers[key] = value;
+      }
+    }
+    headers["Status Code"] = xhr.status + " " + xhr.statusText;
+    //restclient.log(headers);
+    
+    restclient.main.setResponseHeader(headers);
+    var contentType = xhr.getResponseHeader("Content-Type");
+
+    var displayHandler = 'display';
+    if(contentType && contentType != '') {
+      if(contentType.indexOf('html') >= 0) {
+        displayHandler = 'displayHtml';
+      }     
+    }
+    
+
+    var response = xhr.responseText;
+    var requestToken = decodeURIComponent(response.split('&')[0].split('oauth_token=')[1]).trim();
+    var requestTokenSecret = decodeURIComponent(response.split('&')[1].split('oauth_token_secret=')[1]).trim();
+
+    $('#signature-request [name="request_token"]').val(requestToken);
+    $('#signature-request [name="request_token_secret"]').val(requestTokenSecret);
+    
+
+    restclient.main.authorizeRequestToken(requestToken, requestTokenSecret);
+    
+    restclient.main.updateProgressBar(-1);
+  },
+  sendAuthorizeRequest: function(requestMethod, requestUrl, requestHeaders, mimeType, requestBody) {
+    try{
+      restclient.main.updateProgressBar(100);
+      restclient.main.showResponse();
+      restclient.http.mimeType = mimeType;
+      //restclient.log(requestMethod);
+      var xhr = Components.classes["@mozilla.org/xmlextras/xmlhttprequest;1"].createInstance(Components.interfaces.nsIXMLHttpRequest);
+      xhr.onerror = restclient.http.onerror;
+      xhr.onload = restclient.http.onAuthorizeLoad;
+      xhr.onprogress = restclient.http.onprogress;
+      
+      xhr.open(requestMethod, requestUrl, true);
+      xhr.setRequestHeader("Accept-Language", null);
+
+      for(var i=0, header; header = requestHeaders[i]; i++) {
+        xhr.setRequestHeader(header[0], header[1]);
+        
+        //Override XMLHTTPRequest default charset
+        if(typeof mimeType != 'string' && 
+            header[0].toLowerCase() == 'content-type' && header[1].toLowerCase().indexOf('charset') > -1)
+        {
+          xhr.overrideMimeType(header[1]);
+        }
+      }
+
+      if(typeof mimeType == 'string')
+        xhr.overrideMimeType(mimeType);
+
+      restclient.http.xhr = xhr;
+      if(restclient.getPref('requestTimer', false) === true)
+        restclient.http.startTime = new Date().getTime();
+      else
+        restclient.http.startTime = false;
+        
+      xhr.send(requestBody);
+    } catch (e) {
+      restclient.main.setResponseHeader({"Error": [
+                                                  "Could not connect to server",
+                                                  e.message
+                                                  ]}, false);
+      restclient.main.updateProgressBar(-1);
+    }
+  },
+  onAuthorizeLoad: function(xhr) {
+    
+    restclient.main.clearResult();
+    xhr = xhr.target;
+
+    debugger
+    if(xhr.status === '200' && xhr.responseText.indexOf('Authorization Verified') !== -1) {
+        //get request token
+        var request_token = $('#signature-request [name="request_token"]').val(),
+            request_token_secret = $('#signature-request [name="request_token_secret"]').val();
+
+        restclient.main.generateAccessToken(requestToken, requestTokenSecret);
+    }
+    
+
+    restclient.main.updateProgressBar(-1);
+  },
+  sendAccessTokenRequest: function(requestMethod, requestUrl, requestHeaders, mimeType, requestBody) {
+    try{
+      restclient.main.updateProgressBar(100);
+      restclient.main.showResponse();
+      restclient.http.mimeType = mimeType;
+      //restclient.log(requestMethod);
+      var xhr = Components.classes["@mozilla.org/xmlextras/xmlhttprequest;1"].createInstance(Components.interfaces.nsIXMLHttpRequest);
+      xhr.onerror = restclient.http.onerror;
+      xhr.onload = restclient.http.onAccessTokenLoad;
+      xhr.onprogress = restclient.http.onprogress;
+      
+      xhr.open(requestMethod, requestUrl, true);
+      xhr.setRequestHeader("Accept-Language", null);
+
+      for(var i=0, header; header = requestHeaders[i]; i++) {
+        xhr.setRequestHeader(header[0], header[1]);
+        
+        //Override XMLHTTPRequest default charset
+        if(typeof mimeType != 'string' && 
+            header[0].toLowerCase() == 'content-type' && header[1].toLowerCase().indexOf('charset') > -1)
+        {
+          xhr.overrideMimeType(header[1]);
+        }
+      }
+
+      if(typeof mimeType == 'string')
+        xhr.overrideMimeType(mimeType);
+
+      restclient.http.xhr = xhr;
+      if(restclient.getPref('requestTimer', false) === true)
+        restclient.http.startTime = new Date().getTime();
+      else
+        restclient.http.startTime = false;
+        
+      xhr.send(requestBody);
+    } catch (e) {
+      restclient.main.setResponseHeader({"Error": [
+                                                  "Could not connect to server",
+                                                  e.message
+                                                  ]}, false);
+      restclient.main.updateProgressBar(-1);
+    }
+  },
+  onAccessTokenLoad: function(xhr) {
+    if(restclient.http.startTime)
+    {
+      var requestTime = (new Date().getTime()) - restclient.http.startTime;
+      restclient.main.showStatus('Execute Time : ' + requestTime + 'ms')
+    }
+    restclient.main.clearResult();
+    xhr = xhr.target;
+    var headers = {};
+    headers["Status Code"] = xhr.status + " " + xhr.statusText;
+
+    var headersText     = xhr.getAllResponseHeaders(),
+        responseHeaders = headersText.split("\n"),
+        key, value;
+
+    for (var i = 0, header; header = responseHeaders[i]; i++) {
+      if(header.indexOf(":") > 0) {
+        key   = header.substring(0, header.indexOf(":"));
+        value = xhr.getResponseHeader(key);
+        if(value)
+          headers[key] = value;
+      }
+    }
+    headers["Status Code"] = xhr.status + " " + xhr.statusText;
+    //restclient.log(headers);
+    
+    restclient.main.setResponseHeader(headers);
+    var contentType = xhr.getResponseHeader("Content-Type");
+
+    var displayHandler = 'display';
+    if(contentType && contentType != '') {
+      if(contentType.indexOf('html') >= 0) {
+        displayHandler = 'displayHtml';
+      }     
+    }
+    
+    var response = xhr.responseText;
+    var accessToken = decodeURIComponent(response.split('&')[0].split('oauth_token=')[1]).trim();
+    var accessTokenSecret = decodeURIComponent(response.split('&')[1].split('oauth_token_secret=')[1]).trim();
+
+    $('#signature-request [name="access_token"]').val(accessToken);
+    $('#signature-request [name="access_token_secret"]').val(accessTokenSecret);    
+    
+    restclient.main.updateProgressBar(-1);
   }
-}
+
+};
