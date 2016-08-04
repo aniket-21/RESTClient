@@ -35,7 +35,7 @@ restclient.oauth = {
   reset: function() {
     delete this._parameters;
     delete this._path;
-    delete this._secret;
+    delete this._secrets;
     delete this._realm;
   },
   sign: function(arg) {

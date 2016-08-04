@@ -1973,6 +1973,7 @@ restclient.main = {
                  };
 
       //Sign request for request token
+      restclient.oauth.reset();
       var signature = restclient.oauth.sign(sign);
       restclient.log(signature);
 
@@ -2015,7 +2016,7 @@ restclient.main = {
 
     var authorizeEndPoint = '/OAuth/Authorize';
 
-    var returnUrl = 'https://' + host + authorizeEndPoint + '?oauth_token=' + requestToken + '&fromSignIn=true';
+    var returnUrl = 'https://' + host + authorizeEndPoint + '?oauth_token=' + encodeURIComponent(requestToken) + '&fromSignIn=true';
     var referrerUrl = 'https://' + host + '/LogOn?ReturnUrl=' + encodeURIComponent(returnUrl);
     var authorizeUrl = 'https://' + host + '/Authentication/LogOn?ReturnUrl=' + encodeURIComponent(returnUrl) ;
 
@@ -2082,6 +2083,7 @@ restclient.main = {
                };
 
     //Sign request for request token
+    restclient.oauth.reset();
     var signature = restclient.oauth.sign(sign);
     restclient.log(signature);
 

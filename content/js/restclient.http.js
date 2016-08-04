@@ -289,16 +289,13 @@ restclient.http = {
     xhr = xhr.target;
 
     debugger
-    if(xhr.status === '200' && xhr.responseText.indexOf('Authorization Verified') !== -1) {
+    if(xhr.status == 200 && xhr.responseText.indexOf('Authorization Verified') != -1) {
         //get request token
         var request_token = $('#signature-request [name="request_token"]').val(),
             request_token_secret = $('#signature-request [name="request_token_secret"]').val();
 
-        restclient.main.generateAccessToken(requestToken, requestTokenSecret);
-    }
-    
-
-    restclient.main.updateProgressBar(-1);
+        restclient.main.generateAccessToken(request_token, request_token_secret);
+    }    
   },
   sendAccessTokenRequest: function(requestMethod, requestUrl, requestHeaders, mimeType, requestBody) {
     try{
