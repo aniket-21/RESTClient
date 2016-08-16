@@ -323,12 +323,14 @@
         <ul class="nav nav-tabs">
           <li class="active"><a href="#signature-request" data-toggle="tab">Signature for this request</a></li>
           <li><a href="#oauth-setting" data-toggle="tab">OAuth setting</a></li>
+          <li class=""><a href="#token-generation" data-toggle="tab">Token Generation</a></li>
         </ul>
         <div class="tab-content">
           <div class="tab-pane active" id="signature-request">
             <form class="form-horizontal" onsubmit="return false;">
               <div class="control-group">
                 <label class="control-label" for="env">Environment</label>
+                <!--
                 <div class="controls">
                   <select name="environment" class="input-xlarge">
                     <option value="Dev" selected>Development</option>
@@ -336,6 +338,7 @@
                     <option value="Prd">Production</option>
                   </select>
                 </div>
+                -->
               </div>
               <div class="control-group">
                 <label for="consumer_key" class="control-label">Consumer key</label>
@@ -363,6 +366,7 @@
                   <input type="text" name="request_token_secret" class="hide">
                 </div>
               </div>
+              <!--
               <div class="control-group">
                 <label for="use_credentials" class="control-label"></label>
                 <div class="controls">
@@ -383,6 +387,7 @@
                   <input type="text" name="password" class="input-xlarge">
                 </div>
               </div>
+              -->
             </form>  
           
             <div class="modal-footer">
@@ -391,6 +396,7 @@
                 <span style="margin-top: 10px;">Remember the setting</span>
               </div>
               
+
               <a style="padding: 3px 10px; margin-right: 8px" class="btn btn-success btnGenerateToken" href="#">Generate token</a>
 
               <input style="float:right;padding: 3px 10px;" class="btn btn-info btnClose" value="Close" onclick="$('#window-oauth').hide();" type="button">
@@ -458,7 +464,46 @@
             <input class="btn btn-success btnOkay" type="button" value="Save">
             <input class="btn btn-info btnClose" type="button" value="Close" onclick="$('#window-oauth').hide();">
           </div>
+          
           </div>
+      <div class="tab-pane" id="token-generation">
+      <form class="form-horizontal" onsubmit="return false;">
+          <div class="infobar" style="width: 85%; margin: 0 auto;"></div>
+          <div class="control-group">
+            <label class="control-label" for="environment_method">Environment</label>
+            <div class="controls">
+              <select name="environment" class="input-xlarge">
+              <option value="Local" selected>Local</option>
+                <option value="F1Dev" selected>F1Dev</option>
+                <option value="F2Dev" selected>F2Dev</option>
+                <option value="dev" selected>Dev</option>
+                <option value="IntegDev" selected>IntegDev</option>
+                <option value="stg" selected>Staging</option>
+                <option value="StagingQA" selected>StagingQA</option>
+                <option value="prd" selected>Production</option>
+                <option value="ProductionQA" selected>ProductionQA</option>
+              </select>
+            </div>
+          </div>
+          <div class="control-group">
+            <label for="username" class="control-label">Username</label>
+            <div class="controls">
+              <input type="text" name="username" class="input-xlarge"  placeholder="username">
+            </div>
+          </div>
+          <div class="control-group">
+            <label for="password" class="control-label">Password</label>
+            <div class="controls">
+              <input type="text" name="password" class="input-xlarge"  placeholder="password">
+            </div>
+          </div>
+          <!--
+          <div class="control-group">
+            <a style="padding: 3px 10px; margin-right: 8px" class="btn btn-success btnGenerateToken" href="#">Generate token</a>
+          </div>
+          -->
+        </form>
+    </div><!-- end of token generation panel //-->
         </div>
       </div>
     </div><!--end window-wrapper//-->
